@@ -11,13 +11,61 @@
 <meta property="og:type" content="website">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="bxzIqrxl0pra8Q_jXHYXvhXnarTDYViJEQrt-3hOwJU" />
+<script>
+    (function() {
+        var t = localStorage.getItem('theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+</script>
 
 <style>
+    :root {
+        --bg:              #ffffff;
+        --text:            #111111;
+        --text-p:          #222222;
+        --muted:           #555555;
+        --divider:         #e6e6e6;
+        --accent-border:   #cccccc;
+        --switch-hover:    #f5f5f5;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg:              #141414;
+            --text:            #e8e8e8;
+            --text-p:          #cccccc;
+            --muted:           #999999;
+            --divider:         #2e2e2e;
+            --accent-border:   #444444;
+            --switch-hover:    #222222;
+        }
+    }
+
+    html[data-theme="dark"] {
+        --bg:              #141414;
+        --text:            #e8e8e8;
+        --text-p:          #cccccc;
+        --muted:           #999999;
+        --divider:         #2e2e2e;
+        --accent-border:   #444444;
+        --switch-hover:    #222222;
+    }
+
+    html[data-theme="light"] {
+        --bg:              #ffffff;
+        --text:            #111111;
+        --text-p:          #222222;
+        --muted:           #555555;
+        --divider:         #e6e6e6;
+        --accent-border:   #cccccc;
+        --switch-hover:    #f5f5f5;
+    }
+
     body {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        background: #ffffff;
-        color: #111;
+        background: var(--bg);
+        color: var(--text);
         line-height: 1.6;
     }
 
@@ -44,16 +92,16 @@
     p {
         font-size: 16px;
         margin: 0 0 16px 0;
-        color: #222;
+        color: var(--text-p);
     }
 
     .muted {
-        color: #555;
+        color: var(--muted);
     }
 
     .divider {
         height: 1px;
-        background: #e6e6e6;
+        background: var(--divider);
         margin: 32px 0;
     }
 
@@ -73,11 +121,17 @@
         opacity: 0.9;
     }
 
+    @media (prefers-color-scheme: dark) {
+        img { filter: invert(1); }
+    }
+    html[data-theme="dark"] img { filter: invert(1); }
+    html[data-theme="light"] img { filter: none; }
+
     .resident-note {
         font-size: 14px;
-        color: #555;
+        color: var(--muted);
         font-style: italic;
-        border-left: 3px solid #ccc;
+        border-left: 3px solid var(--accent-border);
         padding-left: 12px;
         margin-bottom: 16px;
     }
@@ -89,15 +143,31 @@
 
     .lang-switch a {
         font-size: 13px;
-        color: #555;
+        color: var(--muted);
         text-decoration: none;
-        border: 1px solid #ccc;
+        border: 1px solid var(--accent-border);
         padding: 3px 10px;
         border-radius: 4px;
     }
 
     .lang-switch a:hover {
-        background: #f5f5f5;
+        background: var(--switch-hover);
+    }
+
+    .theme-toggle {
+        font-size: 13px;
+        color: var(--muted);
+        background: none;
+        border: 1px solid var(--accent-border);
+        padding: 3px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 6px;
+        font-family: inherit;
+    }
+
+    .theme-toggle:hover {
+        background: var(--switch-hover);
     }
 
     #de { display: none; }
@@ -113,7 +183,7 @@
 <div id="de">
 <div class="container">
 
-    <div class="lang-switch"><a href="#en">EN</a></div>
+    <div class="lang-switch"><a href="#en">EN</a><button class="theme-toggle" onclick="toggleTheme()">&#9790;</button></div>
 
     <h1>Sie sind hier nicht willkommen. Aber Sie dürfen fragen warum.</h1>
 
@@ -237,7 +307,7 @@
 <div id="en">
 <div class="container">
 
-    <div class="lang-switch"><a href="#de">DE</a></div>
+    <div class="lang-switch"><a href="#de">DE</a><button class="theme-toggle" onclick="toggleTheme()">&#9790;</button></div>
 
     <h1>You're not welcome. But you may ask why.</h1>
 
@@ -354,6 +424,29 @@
 
 </div>
 </div>
+
+<script>
+    function toggleTheme() {
+        var html = document.documentElement;
+        var current = html.getAttribute('data-theme');
+        var isDark = current === 'dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var next = isDark ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateToggleButtons(next);
+    }
+
+    function updateToggleButtons(theme) {
+        var icon = theme === 'dark' ? '&#9728;' : '&#9790;';
+        document.querySelectorAll('.theme-toggle').forEach(function(b) { b.innerHTML = icon; });
+    }
+
+    (function() {
+        var saved = localStorage.getItem('theme');
+        var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        updateToggleButtons(theme);
+    })();
+</script>
 
 </body>
 </html>
